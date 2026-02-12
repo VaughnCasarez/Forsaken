@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
@@ -11,6 +12,8 @@ public class PlayerStateMachine : StateMachine, IDamageable
     [SerializeField] private float slashForce = 30f;
     [SerializeField] private float dashSpeed = 15f;
     [SerializeField] private float dashDistance = 5f;
+    [SerializeField] private float parryTiming = 2.5f;
+    [SerializeField] private float parryCooldown = 2.5f;
 
     [Header("Object References")]
     [SerializeField] private GameManager manager;
@@ -33,6 +36,7 @@ public class PlayerStateMachine : StateMachine, IDamageable
     private bool isDashPressed;
     private bool isHurt; 
     private bool attackFinished = false;
+    private bool blockFinished = true;
     private bool shootStarted = false;
     private bool shootFinished = false;
     private bool dashStarted = false;
@@ -40,6 +44,9 @@ public class PlayerStateMachine : StateMachine, IDamageable
     private bool isDashing = false;
     private bool hurtFinished = false;
     private bool grounded = true;
+    private bool isBlocking = false;
+    private bool isParrying = false;
+    private bool canParry = false;
 
     //player info
     private int health;
@@ -49,7 +56,9 @@ public class PlayerStateMachine : StateMachine, IDamageable
     //additional game objects
     private GameObject dashTrail;
     private Transform groundCheck;
-
+    private Player_Ranged rangedWeapon;
+    private int currentParryCooldownId;
+    private ParticleSystem damageTakenParticles;
     //getters and settesr
     public GameManager Manager {get {return manager;}}
     public bool CanMove {get {return canMove;} set {canMove = value;}}
@@ -65,8 +74,22 @@ public class PlayerStateMachine : StateMachine, IDamageable
         return Mathf.Sign(mouseDirX) == facing;
     }}
     public bool IsDashPressed {get {return isDashPressed;} set {isDashPressed = value;}}
+    public bool IsBlocking {get {return isBlocking;} set {isBlocking = value;}}
+
+    public bool CanParry {
+        get {
+            return canParry;
+        }
+        set {
+            canParry = value;
+            currentParryCooldownId++;
+        }
+    } // every change of the can parry variable makes a new id
+
+    public bool IsParrying {get {return isParrying;} set {isParrying = value;}}
     public bool IsHurt{get {return isHurt;} set {isHurt = value;}}
     public bool AttackFinished {get {return attackFinished; } set {attackFinished = value;}}
+    public bool BlockFinished {get {return blockFinished; } set {blockFinished = value;}}
     public bool ShootStarted {get {return shootStarted; } set {shootStarted = value;}}
     public bool ShootFinished {get {return shootFinished; } set {shootFinished = value;}}
     public bool DashStarted {get {return dashStarted; } set {dashStarted = value;}}
@@ -84,6 +107,7 @@ public class PlayerStateMachine : StateMachine, IDamageable
     public int Health {get {return health;} set {health = value;}}
     public float Cooldown {get {return damageCooldown;} set {damageCooldown = value;}}
     public GameObject DashTrail {get {return dashTrail;}}
+    public Player_Ranged RangedWeapon { get { return rangedWeapon; } }
 
     protected override void Init()
     {
@@ -94,6 +118,9 @@ public class PlayerStateMachine : StateMachine, IDamageable
         dashTrail = transform.Find("ghost trail").gameObject;
         groundCheck = transform.Find("groundedCheck");
         swordHitbox = sprite.Find("sword").GetComponent<BoxCollider2D>();
+        rangedWeapon = GetComponentInChildren<Player_Ranged>();
+        damageTakenParticles = sprite.Find("hit received particles").GetComponent<ParticleSystem>();
+
         //set player input callbacks
         playerInput.CharacterControls.Move.started += OnMovementPerformed;
         playerInput.CharacterControls.Move.canceled += OnMovementCancelled;
@@ -106,6 +133,8 @@ public class PlayerStateMachine : StateMachine, IDamageable
         playerInput.CharacterControls.Hit.canceled += OnHit;
         playerInput.CharacterControls.Shoot.started += OnShoot;
         playerInput.CharacterControls.Shoot.canceled += OnShoot;
+        playerInput.CharacterControls.Block.performed += OnBlock;
+        playerInput.CharacterControls.Block.canceled += OnBlock;
 
         Health = 100;
         Cooldown = 1f;
@@ -181,6 +210,9 @@ public class PlayerStateMachine : StateMachine, IDamageable
     {
         isShootPressed = shootUnlocked && context.ReadValueAsButton();
     }
+    void OnBlock(InputAction.CallbackContext context) {
+        isBlocking = context.ReadValueAsButton();
+    }
     void OnDash(InputAction.CallbackContext context)
     {
         isDashPressed = context.ReadValueAsButton();
@@ -195,23 +227,49 @@ public class PlayerStateMachine : StateMachine, IDamageable
     {
         playerInput.CharacterControls.Disable();
     }
+    
+    private IEnumerator StartParryCooldownInternal() {
+        CanParry = true;
+        int targetParryCooldownId = currentParryCooldownId;
+        yield return new WaitForSeconds(parryCooldown);
+        if (targetParryCooldownId == currentParryCooldownId) {
+            CanParry = false; // nothing was changed during the wait so was in the same parry
+        }
+    }
+    
+    private IEnumerator StartParryInternal() {
+        if (IsParrying) yield break;
+        IsParrying = true;
+        yield return new WaitForSeconds(parryTiming);
+        IsParrying = false;
+    }
 
-    public void ApplyDamage(int damage)
+    public void StartParry()
     {
-        if (Time.time > canTakeDamage && !isDashing)
-        {
+        Debug.Log("starting parry");
+        StartCoroutine(StartParryInternal());
+        IsHurt = false;
+        CanParry = false; 
+        IsBlocking = false;
+    }
+    public void StartParryCooldown() {
+        StartCoroutine(StartParryCooldownInternal());
+    }
+    public void ApplyDamage(int damage) {
+        if (Time.time > canTakeDamage && !IsParrying)
+        {   Debug.Log("taking damage");
             canTakeDamage = Time.time + Cooldown;
-            Health -= damage;
+            Health -= damage; 
             IsHurt = true;
+            
+            damageTakenParticles.Play();
         }
         UpdateHealthText();
         if (Health <= 0f)
         {
             manager.CheckWinStatus();
         }
-       
     }
-
 
     void OnAttackAnimationStart()
     {
@@ -223,6 +281,19 @@ public class PlayerStateMachine : StateMachine, IDamageable
     void OnAttackAnimationFinish()
     {
         AttackFinished = true;
+        swordHitbox.enabled = false;
+    }
+
+    void OnBlockAnimationStart()
+    {
+        BlockFinished = false;
+        swordHitbox.enabled = true;
+
+    }
+
+    void OnBlockAnimationFinish()
+    {
+        BlockFinished = true;
         swordHitbox.enabled = false;
     }
 

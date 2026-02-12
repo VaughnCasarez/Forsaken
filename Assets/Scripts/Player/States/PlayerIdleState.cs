@@ -11,7 +11,7 @@ public class PlayerIdleState : State
     public override void EnterState()
     {
         playerContext.CanMove = true;
-        playerContext.Anim.Play("Idle");
+        playerContext.Anim.SetTrigger("idle");
         playerContext.AppliedMovementX = 0f;
         playerContext.AppliedMovementY = 0f;
     }
@@ -21,6 +21,7 @@ public class PlayerIdleState : State
     }
     public override void ExitState()
     {
+        playerContext.Anim.ResetTrigger("idle");
     }
 
     public override void CheckSwitchStates()
@@ -45,6 +46,8 @@ public class PlayerIdleState : State
         } else if (playerContext.IsMovementPressed)
         {   
             SwitchState(new PlayerWalkState(playerContext));
-        } 
+        } else if (playerContext.IsBlocking) {
+            SwitchState(new PlayerBlockState(playerContext));
+        }
     }
 }
