@@ -1082,6 +1082,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &263262317
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 263262318}
+  m_Layer: 0
+  m_Name: SummonPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &263262318
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263262317}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12.44, y: -3.63, z: -1.4771487}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &286688207
 GameObject:
   m_ObjectHideFlags: 0
@@ -3572,8 +3603,28 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
+      propertyPath: dashSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
       propertyPath: timeInIdle
-      value: 3
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
+      propertyPath: dashDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
+      propertyPath: summonCooldown
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
+      propertyPath: summonPosition
+      value: 
+      objectReference: {fileID: 263262318}
+    - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
+      propertyPath: dashMovementCooldown
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 686286107829047635, guid: d19d52292a0f31b4f98cca3a78e5fc74, type: 3}
       propertyPath: grappleTargetDistance
@@ -23253,7 +23304,7 @@ PrefabInstance:
       objectReference: {fileID: 1313506175}
     - target: {fileID: 6592745165462393320, guid: 37d6291cfcafaac449be5c622c0c56d3, type: 3}
       propertyPath: numStages
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6592745165462393320, guid: 37d6291cfcafaac449be5c622c0c56d3, type: 3}
       propertyPath: winScreen
@@ -23310,3 +23361,4 @@ SceneRoots:
   - {fileID: 1140383579}
   - {fileID: 1942510344041767437}
   - {fileID: 1558957426}
+  - {fileID: 263262318}

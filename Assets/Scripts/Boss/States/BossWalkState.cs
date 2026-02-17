@@ -32,6 +32,7 @@ public class BossWalkState : State
             SwitchState(new BossDashState(bossContext));
         } else if (bossContext.InRange())
         {
+            bossContext.NextAttack = 2;
             SwitchState(new BossMeleeAttackState(bossContext));
         } 
     }

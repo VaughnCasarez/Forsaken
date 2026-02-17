@@ -4,6 +4,7 @@ public class BossStateMachine : StateMachine, IDamageable
 {
     [Header("Object References")]
     [SerializeField] private GameManager manager;
+    [SerializeField] private Transform summonPosition;
 
     [Header("Attack Controls")]
     [SerializeField] private float targetDistance;
@@ -26,7 +27,11 @@ public class BossStateMachine : StateMachine, IDamageable
     [Header("Charged Attack Dash Settings")]
     [SerializeField] private float dashCD;
     [SerializeField] private float dashRange;
-    
+
+    [Header("Enemy Summons Settings")]
+    [SerializeField] private float summonCooldown;
+    [SerializeField] private int numEnemies;
+
     private bool isFlipped = false;
     private bool isStunned = false;
     private int grapplingFinished = 0;
@@ -41,8 +46,12 @@ public class BossStateMachine : StateMachine, IDamageable
 
     private float lastDashTime = 0;
     private float lastDashMovementTime = 0;
+    private float lastDroneSummon = 0;
+    private int curEnemies = 0;
 
+    private int nextAttack;
     
+    public Transform SummonPos {get {return summonPosition;}}
     public bool FightStarted {get {return manager.FightStarted;}}
     public bool IsStunned {get {return isStunned;} set {isStunned = value;}}
     public bool IsDashing {get {return isDashing;} set {isDashing = value;}}
@@ -58,6 +67,7 @@ public class BossStateMachine : StateMachine, IDamageable
     public int Damage {get {return damage;} set {damage = value;}}
     public float LastDashMovementTime { get { return lastDashMovementTime; } set { lastDashMovementTime = value; } }
     public float LastDashTime { get { return lastDashTime; } set { lastDashTime = value; } }
+    public float LastDroneSummon { get { return lastDroneSummon; } set { lastDroneSummon = value; } }
     public float Cooldown {get {return damageCooldown;} set {damageCooldown = value;}}
     public float TimeInIdle {get {return timeInIdle;}}
     public float StunTime {get {return stunTime;}}
@@ -69,6 +79,7 @@ public class BossStateMachine : StateMachine, IDamageable
     public float GrappleSpeed {get {return grappleSpeed;}}
     public float GrappleTargetDistance {get {return grappleTargetDistance;}}
     public int CurrentStage {get {return manager.CurrentStage;} set {manager.CurrentStage = value;}}
+    public int NextAttack {get {return nextAttack;} set {nextAttack = value;}}
 
     protected override void Init()
     {
@@ -147,6 +158,10 @@ public class BossStateMachine : StateMachine, IDamageable
     {
         return !InDashRange() && (Time.time >= lastDashMovementTime + dashMovementCooldown);
     }
+    public bool CanSummon()
+    {
+        return Time.time >= lastDroneSummon + summonCooldown;
+    }
 
 
     public bool InRange()
@@ -193,6 +208,7 @@ public class BossStateMachine : StateMachine, IDamageable
 
     public void OnLaserAttackEnd()
     {
+        Debug.Log("lasers finished");
         lasersFinished = 1;
 
     }

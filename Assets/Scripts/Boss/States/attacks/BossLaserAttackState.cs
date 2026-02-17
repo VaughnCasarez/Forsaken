@@ -11,7 +11,7 @@ public class BossLaserAttackState : State
     public override void EnterState()
     {
         Debug.Log("laser attack");
-        bossContext.Anim.SetTrigger("lasers");
+        bossContext.Anim.SetTrigger("laser");
     }
 
     public override void UpdateState()
@@ -21,13 +21,14 @@ public class BossLaserAttackState : State
 
     public override void ExitState()
     {
-        bossContext.Anim.ResetTrigger("lasers");
+        bossContext.Anim.ResetTrigger("laser");
     }
 
     public override void CheckSwitchStates()
     {
         if (bossContext.LasersFinished == 1)
         {
+            Debug.Log("finished");
             SwitchState(new BossIdleState(bossContext));
         }
     }

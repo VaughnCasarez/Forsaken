@@ -21,6 +21,7 @@ public class BossIdleState : State
     }
     public override void ExitState()
     {
+        bossContext.Anim.ResetTrigger("idle");
     }
 
     public override void CheckSwitchStates()
@@ -34,18 +35,18 @@ public class BossIdleState : State
             // } else 
             if (bossContext.CurrentStage < 3)
             {
-                if ( randomChance < 0.5f)
+                if (bossContext.CurrentStage == 2 && bossContext.CanSummon())
                 {
+                    bossContext.NextAttack = 2;
+                    SwitchState(new BossBeginSummonsState(bossContext));
+                }
+                else if ( randomChance < 0.3f)
+                {
+                    bossContext.NextAttack = 1;
                     SwitchState(new BossLaserAttackState(bossContext));
                 }
                 else {
-                    if (bossContext.InRange())
-                    {
-                        SwitchState(new BossMeleeAttackState(bossContext));
-                    } else
-                    {   
-                        SwitchState(new BossWalkState(bossContext));
-                    }
+                    SwitchState(new BossWalkState(bossContext));
                 }
             }
             
