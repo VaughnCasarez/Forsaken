@@ -23304,7 +23304,7 @@ PrefabInstance:
       objectReference: {fileID: 1313506175}
     - target: {fileID: 6592745165462393320, guid: 37d6291cfcafaac449be5c622c0c56d3, type: 3}
       propertyPath: numStages
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6592745165462393320, guid: 37d6291cfcafaac449be5c622c0c56d3, type: 3}
       propertyPath: winScreen

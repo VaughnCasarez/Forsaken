@@ -12,22 +12,20 @@ public class StageThree : State
     }
     public override void InitializeSubStates()
     {
-        // // if (bossContext.GrappleInRange())
-        // // {
-        // //     SetSubState(new BossGrappleState(bossContext));
-        // // }
-        // // else 
-        // if (bossContext.canDashAttack())
-        // {
-        //     SetSubState(new BossDashWindupState(bossContext));
-        // }
-        // else if (bossContext.InRange())
-        // {
-        //     SetSubState(new BossAttackState(bossContext));
-        // }
-        // else {
-        //     SetSubState(new BossIdleState(bossContext));
-        // }
+        if (bossContext.NextAttack == 1)
+        {   
+            SetSubState(new BossLaserAttackState(bossContext));
+        } else if (bossContext.NextAttack == 2)
+        {
+            SetSubState(new BossMeleeAttackState(bossContext));
+        } else if (bossContext.NextAttack == 3)
+        {
+            SetSubState(new BossChargedDashState(bossContext));
+        } 
+        else 
+        {
+            SetSubState(new BossIdleState(bossContext));
+        }
     }
     public override void EnterState()
     {
