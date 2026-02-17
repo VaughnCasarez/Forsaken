@@ -32,19 +32,23 @@ public class BossIdleState : State
             // {
             //     SwitchState(new BossGrappleState(bossContext));
             // } else 
-            if ( randomChance < 0.5f && bossContext.canDash())
+            if (bossContext.CurrentStage < 3)
             {
-                SwitchState(new BossDashWindupState(bossContext));
-            }
-            else {
-                if (bossContext.InRange())
+                if ( randomChance < 0.5f)
                 {
-                    SwitchState(new BossAttackState(bossContext));
-                } else
-                {   
-                    SwitchState(new BossWalkState(bossContext));
+                    SwitchState(new BossLaserAttackState(bossContext));
+                }
+                else {
+                    if (bossContext.InRange())
+                    {
+                        SwitchState(new BossMeleeAttackState(bossContext));
+                    } else
+                    {   
+                        SwitchState(new BossWalkState(bossContext));
+                    }
                 }
             }
+            
         } 
     }
 }

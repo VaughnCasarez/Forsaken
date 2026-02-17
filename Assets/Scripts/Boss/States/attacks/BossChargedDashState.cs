@@ -1,19 +1,18 @@
-using UnityEditor.Rendering;
 using UnityEngine;
-
-public class BossAttackState : State
+public class BossChargedDashState : State
 {
     private BossStateMachine bossContext;
-    public BossAttackState(BossStateMachine currentContext) : base(currentContext)
+    public BossChargedDashState(BossStateMachine currentContext) : base(currentContext)
     {
-        
         bossContext = currentContext;
     }
     public override void EnterState()
     {
         bossContext.AttackFinished = 0;
-        bossContext.Anim.Play("Attack");
-        bossContext.AppliedMovementX = 0f;
+        bossContext.Anim.SetTrigger("dashAttack");
+        bossContext.AppliedMovementX = ((bossContext.Flipped ? -1 : 1)) * bossContext.MoveSpeed * 3;
+        bossContext.LastDashTime = Time.time;
+        Debug.Log("This is existing");
     }
     public override void UpdateState()
     {
@@ -21,6 +20,7 @@ public class BossAttackState : State
     }
     public override void ExitState()
     {
+        bossContext.Anim.ResetTrigger("dashAttack");
         bossContext.AttackFinished = 1;
     }
 

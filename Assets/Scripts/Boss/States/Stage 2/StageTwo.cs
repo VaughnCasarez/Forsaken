@@ -12,21 +12,21 @@ public class StageTwo : State
     }
     public override void InitializeSubStates()
     {
-        // if (bossContext.GrappleInRange())
+        // // if (bossContext.GrappleInRange())
+        // // {
+        // //     SetSubState(new BossGrappleState(bossContext));
+        // // }
+        // // else 
+        // if (bossContext.InRange())
         // {
-        //     SetSubState(new BossGrappleState(bossContext));
-        // }
-        // else 
-        if (bossContext.InRange())
-        {
-            SetSubState(new BossAttackState(bossContext));
-        } else if (bossContext.canDash())
-        {   
-            SetSubState(new BossDashWindupState(bossContext));
-        } else
-        {   
-            SetSubState(new BossIdleState(bossContext));
-        } 
+        //     SetSubState(new BossAttackState(bossContext));
+        // } else if (bossContext.canDashAttack())
+        // {   
+        //     SetSubState(new BossDashWindupState(bossContext));
+        // } else
+        // {   
+        //     SetSubState(new BossIdleState(bossContext));
+        // } 
     }
     public override void EnterState()
     {

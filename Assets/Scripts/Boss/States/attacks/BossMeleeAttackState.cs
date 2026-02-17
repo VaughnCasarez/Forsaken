@@ -1,18 +1,19 @@
+using UnityEditor.Rendering;
 using UnityEngine;
-public class BossChargedDashState : State
+
+public class BossMeleeAttackState : State
 {
     private BossStateMachine bossContext;
-    public BossChargedDashState(BossStateMachine currentContext) : base(currentContext)
+    public BossMeleeAttackState(BossStateMachine currentContext) : base(currentContext)
     {
+        
         bossContext = currentContext;
     }
     public override void EnterState()
     {
         bossContext.AttackFinished = 0;
-        bossContext.Anim.Play("Attack");
-        bossContext.AppliedMovementX = ((bossContext.Flipped ? -1 : 1)) * bossContext.MoveSpeed * 3;
-        bossContext.LastDashTime = Time.time;
-        Debug.Log("This is existing");
+        bossContext.Anim.SetTrigger("melee");
+        bossContext.AppliedMovementX = 0f;
     }
     public override void UpdateState()
     {
@@ -21,6 +22,7 @@ public class BossChargedDashState : State
     public override void ExitState()
     {
         bossContext.AttackFinished = 1;
+        bossContext.Anim.ResetTrigger("melee");
     }
 
     public override void CheckSwitchStates()

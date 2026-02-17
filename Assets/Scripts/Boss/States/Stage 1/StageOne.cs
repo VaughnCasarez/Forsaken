@@ -12,13 +12,17 @@ public class StageOne : State
     }
     public override void InitializeSubStates()
     {
-        if (bossContext.canDash())
+        float randomChance = Random.Range(0f, 1f);
+        if (bossContext.canDashAttack())
         {
             SetSubState(new BossDashWindupState(bossContext));
-        } else if (bossContext.InRange())
+        } else if (randomChance < 0.5f )
         {   
-            SetSubState(new BossAttackState(bossContext));
-        } else
+            SetSubState(new BossLaserAttackState(bossContext));
+        } else if (bossContext.InRange())
+        {
+            SetSubState(new BossMeleeAttackState(bossContext));
+        } else 
         {
             SetSubState(new BossIdleState(bossContext));
         }

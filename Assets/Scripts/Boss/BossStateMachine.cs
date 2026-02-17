@@ -13,6 +13,11 @@ public class BossStateMachine : StateMachine, IDamageable
     [SerializeField] private int damage;
     [SerializeField] private float damageCooldown;
 
+    [Header("Dash Targetting Controls")]
+    [SerializeField] private float dashMovementCooldown;
+    [SerializeField] private float dashDistance;
+    [SerializeField] private float dashSpeed;
+
     [Header("Grapple Settings")]
     [SerializeField] private float grappleTargetDistance;
     [SerializeField] private float grappleDuration;
@@ -27,6 +32,7 @@ public class BossStateMachine : StateMachine, IDamageable
     private int grapplingFinished = 0;
     private bool isDashing = false;
     private int attackFinished = 0;
+    private int lasersFinished = 0;
     private bool windUpFinished = true;
     private int hurtFinished = 0;
     private int introFinished = 0;
@@ -34,6 +40,7 @@ public class BossStateMachine : StateMachine, IDamageable
     private ParticleSystem damageTakenParticles;
 
     private float lastDashTime = 0;
+    private float lastDashMovementTime = 0;
 
     
     public bool FightStarted {get {return manager.FightStarted;}}
@@ -43,17 +50,21 @@ public class BossStateMachine : StateMachine, IDamageable
     public int GrapplingFinished {get {return grapplingFinished;} set {grapplingFinished = value;}}
     public bool WindUpFinished { get {return windUpFinished;} set { windUpFinished = value; } }
     public int AttackFinished {get {return attackFinished; } set {attackFinished = value;}}
+    public int LasersFinished {get {return lasersFinished; } set {lasersFinished = value;}}
     public bool Flipped { get {return isFlipped;}}
     public int HurtFinished {get {return hurtFinished; } set {hurtFinished = value;}}
     public int IntroFinished {get {return introFinished; } set {introFinished = value;}}
     public int Health {get {return health;} set {health = value;}}
     public int Damage {get {return damage;} set {damage = value;}}
+    public float LastDashMovementTime { get { return lastDashMovementTime; } set { lastDashMovementTime = value; } }
     public float LastDashTime { get { return lastDashTime; } set { lastDashTime = value; } }
     public float Cooldown {get {return damageCooldown;} set {damageCooldown = value;}}
     public float TimeInIdle {get {return timeInIdle;}}
     public float StunTime {get {return stunTime;}}
     public float StunInterval {get {return stunInterval;}}
     public float TargetDistance {get {return targetDistance;}}
+    public float DashDistance {get {return dashDistance;}}
+    public float DashSpeed {get {return dashSpeed;}}
     public float GrappleDuration {get {return grappleDuration;}}
     public float GrappleSpeed {get {return grappleSpeed;}}
     public float GrappleTargetDistance {get {return grappleTargetDistance;}}
@@ -127,14 +138,25 @@ public class BossStateMachine : StateMachine, IDamageable
         }
     }
 
-    public bool canDash()
+    public bool canDashAttack()
     {
         return !InRange() && Vector3.Distance(transform.position, Player.transform.position) <= dashRange && (Time.time >= lastDashTime + dashCD);
     }
 
+    public bool canDashMove()
+    {
+        return !InDashRange() && (Time.time >= lastDashMovementTime + dashMovementCooldown);
+    }
+
+
     public bool InRange()
     {
         return Vector3.Distance(transform.position,Player.transform.position) <= TargetDistance;
+    }
+
+    public bool InDashRange()
+    {
+        return Vector3.Distance(transform.position,Player.transform.position) <= DashDistance;
     }
 
     public bool GrappleInRange()
@@ -161,6 +183,18 @@ public class BossStateMachine : StateMachine, IDamageable
     public void OnAttackEnd()
     {
         attackFinished = 1;
+    }
+
+    public void OnLaserAttackStart()
+    {
+        lasersFinished = 0;
+
+    }
+
+    public void OnLaserAttackEnd()
+    {
+        lasersFinished = 1;
+
     }
 
     public void Stun()
