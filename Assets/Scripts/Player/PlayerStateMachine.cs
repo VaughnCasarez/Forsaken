@@ -68,8 +68,15 @@ public class PlayerStateMachine : StateMachine, IDamageable
     public bool IsHitPressed {get {return isHitPressed;} set {isHitPressed = value;}}
     public bool IsShootPressed {get {return isShootPressed;} set {isShootPressed = value;}}
     public bool IsAimingForward {get {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float mouseDirX = mousePos.x - sprite.position.x;
+        Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane screen = new Plane(Vector3.forward, Vector3.zero);
+        float distanceFromScreen;
+        Vector3 mouseWorldPos = Vector3.zero;
+        if (screen.Raycast(mouseRay, out distanceFromScreen))
+        {
+            mouseWorldPos = mouseRay.GetPoint(distanceFromScreen);
+        }
+        float mouseDirX = mouseWorldPos.x - sprite.position.x;
         float facing = Mathf.Sign(sprite.localScale.x);
         return Mathf.Sign(mouseDirX) == facing;
     }}
