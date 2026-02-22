@@ -16,7 +16,7 @@ public class BossGrappleState : State
     {
         bossContext.Anim.SetTrigger("grapple");
 
-        lineRenderer = bossContext.GetComponentInChildren<LineRenderer>();
+        lineRenderer = bossContext.transform.Find("Chain").GetComponent<LineRenderer>();
         if (lineRenderer == null)
         {
             Debug.LogError("LineRenderer component not found on boss GameObject");

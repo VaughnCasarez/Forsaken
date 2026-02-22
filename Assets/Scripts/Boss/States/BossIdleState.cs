@@ -43,10 +43,10 @@ public class BossIdleState : State
                 bossContext.NextAttack = 3;
                 SwitchState(new BossChargedDashState(bossContext));
             }
-            else if ( randomChance < 0.4f)
+            else if (randomChance < 0.3f)
             {
                 bossContext.NextAttack = 1;
-                SwitchState(new BossLaserAttackState(bossContext));
+                SwitchState(new BossLaserWindupState(bossContext));
             }
             else {
                 SwitchState(new BossWalkState(bossContext));
